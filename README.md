@@ -1,4 +1,4 @@
-Приложение на Ktor Client + Clean Architecture, которое:
+##Приложение на Ktor Client + Clean Architecture, которое:
 •	показывает список лауреатов Нобелевской премии;
 •	позволяет фильтровать по году и/или категории;
 •	при клике на лауреата открывает экран с подробной информацией;
@@ -19,3 +19,4 @@ o	Страна (birthCountry / birthPlace);
 o	Фото (если есть в ответе — поле portraitUrl или аналогичное).
 3.	Clean Architecture;
 4.	Обработка состояний: Loading (CircularProgressIndicator); Success (список); Error (текст ошибки + кнопка «Повторить»).
+
