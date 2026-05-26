@@ -9,9 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,32 +31,32 @@ import com.example.a6_2.domain.entity.NobelPrize
 fun PrizeCard(
     prize: NobelPrize,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null,
+    showFavoriteButton: Boolean = false
 ) {
-    val categoryColor = when (prize.category) {
-        "phy" -> Color(0xFF3B82F6)  // синий
-        "che" -> Color(0xFF10B981)  // зелёный
-        "med" -> Color(0xFFEF4444)  // красный
-        "lit" -> Color(0xFFF59E0B)  // оранжевый
-        "pea" -> Color(0xFF8B5CF6)  // фиолетовый
-        "eco" -> Color(0xFFEC4899)  // розовый
-        else -> Color(0xFF6B7280)   // серый
-    }
+
+    val categoryColor = Color(0xFF1976D2)
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color(0xFFE3F2FD)
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Верхняя строка: год + категория
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onClick() }
+            ) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -75,13 +80,12 @@ fun PrizeCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = categoryColor,
                     modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .padding(horizontal = 3.dp, vertical = 2.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Лауреаты
             prize.laureates.take(2).forEachIndexed { index, laureate ->
                 Column {
                     Text(
@@ -113,6 +117,17 @@ fun PrizeCard(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.primary
                 )
+            }
+            }
+
+            if (showFavoriteButton && onFavoriteClick != null && prize.id != 0) {
+                IconButton(onClick = onFavoriteClick) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                        tint = if (isFavorite) Color(0xFFEF4444) else Color(0xFF9CA3AF)
+                    )
+                }
             }
         }
     }

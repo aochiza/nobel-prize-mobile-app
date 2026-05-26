@@ -49,6 +49,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
@@ -61,6 +62,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
     implementation("io.ktor:ktor-client-logging:2.3.12")
+    implementation("io.ktor:ktor-client-auth:2.3.12")
+
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // Coil (для фото, если будут)
     implementation("io.coil-kt:coil-compose:2.7.0")

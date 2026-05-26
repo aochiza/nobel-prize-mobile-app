@@ -1,6 +1,5 @@
 package com.example.a6_2.presentation.detail
 
-
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -79,7 +78,7 @@ fun PrizeDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color(0xFFE3F2FD)
                 ),
                 modifier = Modifier.shadow(4.dp)
             )
@@ -102,7 +101,7 @@ fun PrizeDetailScreen(
                     text = " Laureates (${prize.laureates.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color=Color(0xFFE3F2FD)
                 )
             }
 
@@ -128,7 +127,7 @@ fun PrizeDetailScreen(
 fun PrizeInfoCard(prize: NobelPrize) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
@@ -137,18 +136,18 @@ fun PrizeInfoCard(prize: NobelPrize) {
                 text = prize.categoryFullName,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = Color(0xFF1A1A1A)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Year: ${prize.awardYear}",
+                text = " Year: ${prize.awardYear}",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color(0xFF6B7280)
             )
             prize.dateAwarded?.let {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Date: $it",
+                    text = " Date: $it",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF9CA3AF)
                 )
@@ -169,11 +168,11 @@ fun LaureateCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected)
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                Color(0xFFF0F0F0)
             else
                 Color.White
         )
@@ -187,16 +186,13 @@ fun LaureateCard(
                     text = laureate.fullName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isSelected)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        Color(0xFF1F2937)
+                    color = Color(0xFF1A1A1A)
                 )
 
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color(0xFF1976D2)
                     )
                 }
             }
@@ -244,10 +240,10 @@ fun LaureateCard(
                 TextButton(
                     onClick = onClick,
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
+                        contentColor = Color(0xFFE3F2FD)
                     )
                 ) {
-                    Text(if (isSelected) "Show less" else "Show details")
+                    Text(if (isSelected) "▲ Show less" else "▼ Show details")
                 }
             }
         }

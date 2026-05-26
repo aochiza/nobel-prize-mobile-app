@@ -13,12 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.a6_2.data.AppDependencies
 import com.example.a6_2.presentation.navigation.NavGraph
 import com.example.a6_2.ui.theme._6_2Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppDependencies.init(applicationContext)
         enableEdgeToEdge()
         setContent {
             _6_2Theme {

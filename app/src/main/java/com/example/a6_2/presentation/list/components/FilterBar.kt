@@ -128,10 +128,10 @@ fun FilterBar(
                 onClick = onClearFilters,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color(0xFFE3F2FD)
                 )
             ) {
-                Text("Reset")
+                Text("Сбросить")
             }
         }
     }

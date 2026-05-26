@@ -2,15 +2,12 @@ package com.example.a6_2.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.a6_2.data.repository.NobelPrizeRepositoryImpl
-import com.example.a6_2.data.remote.ApiServiceImpl
-import com.example.a6_2.data.remote.KtorClientFactory
+import com.example.a6_2.data.AppDependencies
 import com.example.a6_2.domain.entity.FilterParams
 import com.example.a6_2.domain.entity.NobelPrize
 import com.example.a6_2.domain.usecase.FilterPrizesUseCase
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
+import com.example.a6_2.domain.usecase.GetFavoritePrizesUseCase
+import com.example.a6_2.domain.usecase.ToggleFavoriteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,14 +23,25 @@ sealed class PrizeListState {
 class PrizeListViewModel : ViewModel() {
 
     private val filterPrizesUseCase: FilterPrizesUseCase by lazy {
-        val client = KtorClientFactory.createClient()
-        val apiService = ApiServiceImpl(client)
-        val repository = NobelPrizeRepositoryImpl(apiService)
-        FilterPrizesUseCase(repository)
+        AppDependencies.filterPrizesUseCase()
+    }
+
+    private val getFavoritePrizesUseCase: GetFavoritePrizesUseCase by lazy {
+        AppDependencies.getFavoritePrizesUseCase()
+    }
+
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase by lazy {
+        AppDependencies.toggleFavoriteUseCase()
     }
 
     private val _state = MutableStateFlow<PrizeListState>(PrizeListState.Loading)
     val state: StateFlow<PrizeListState> = _state.asStateFlow()
+
+    private val _favoriteIds = MutableStateFlow<Set<Int>>(emptySet())
+    val favoriteIds: StateFlow<Set<Int>> = _favoriteIds.asStateFlow()
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
 
     private val _filterParams = MutableStateFlow(FilterParams())
     val filterParams: StateFlow<FilterParams> = _filterParams.asStateFlow()
@@ -50,6 +58,42 @@ class PrizeListViewModel : ViewModel() {
 
     init {
         loadPrizes()
+        loadFavoriteIds()
+    }
+
+    fun loadFavoriteIds() {
+        viewModelScope.launch {
+            try {
+                val favorites = getFavoritePrizesUseCase()
+                _favoriteIds.value = favorites.map { it.id }.toSet()
+            } catch (_: Exception) {
+                // Избранное недоступно без авторизации — не блокируем список
+            }
+        }
+    }
+
+    fun toggleFavorite(prizeId: Int) {
+        if (prizeId == 0) return
+
+        val isFavorite = prizeId in _favoriteIds.value
+        val previousIds = _favoriteIds.value
+
+        _favoriteIds.update { ids ->
+            if (isFavorite) ids - prizeId else ids + prizeId
+        }
+
+        viewModelScope.launch {
+            try {
+                toggleFavoriteUseCase(prizeId, isFavorite)
+            } catch (e: Exception) {
+                _favoriteIds.value = previousIds
+                _snackbarMessage.value = e.message ?: "Не удалось обновить избранное"
+            }
+        }
+    }
+
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
     }
 
     fun loadPrizes() {

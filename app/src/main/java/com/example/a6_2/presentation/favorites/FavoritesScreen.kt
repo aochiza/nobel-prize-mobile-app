@@ -1,4 +1,4 @@
-package com.example.a6_2.presentation.list
+package com.example.a6_2.presentation.favorites
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,19 +36,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.a6_2.domain.entity.NobelPrize
-import com.example.a6_2.presentation.list.components.FilterBar
 import com.example.a6_2.presentation.list.components.PrizeCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrizeListScreen(
+fun FavoritesScreen(
+    onBack: () -> Unit,
     onPrizeClick: (NobelPrize) -> Unit,
-    onFavoritesClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    viewModel: PrizeListViewModel
+    viewModel: FavoritesViewModel
 ) {
     val state by viewModel.state.collectAsState()
-    val filterParams by viewModel.filterParams.collectAsState()
     val favoriteIds by viewModel.favoriteIds.collectAsState()
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,23 +62,16 @@ fun PrizeListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = " Nobel Laureates",
+                        text = "Favorites",
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                 },
-                actions = {
-                    IconButton(onClick = onFavoritesClick) {
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Favorites",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = onProfileClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = "Profile",
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
                             tint = Color.White
                         )
                     }
@@ -101,61 +90,45 @@ fun PrizeListScreen(
                 .padding(paddingValues)
         ) {
             when (val currentState = state) {
-                is PrizeListState.Loading -> {
+                is FavoritesState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFFE3F2FD)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
-                is PrizeListState.Success -> {
-                    Column {
-                        FilterBar(
-                            selectedYear = filterParams.year,
-                            selectedCategory = filterParams.category,
-                            onYearSelected = viewModel::updateYear,
-                            onCategorySelected = viewModel::updateCategory,
-                            onClearFilters = viewModel::clearFilters,
-                            availableYears = viewModel.getAvailableYears(),
-                            categories = viewModel.getCategories(),
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                        )
-
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            items(
-                                items = currentState.prizes,
-                                key = { prize ->
-                                    if (prize.id != 0) prize.id.toString()
-                                    else "${prize.category}_${prize.awardYear}"
-                                }
-                            ) { prize ->
-                                PrizeCard(
-                                    prize = prize,
-                                    onClick = { onPrizeClick(prize) },
-                                    isFavorite = prize.id in favoriteIds,
-                                    onFavoriteClick = { viewModel.toggleFavorite(prize.id) },
-                                    showFavoriteButton = prize.id != 0
-                                )
-                            }
+                is FavoritesState.Success -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        items(
+                            items = currentState.prizes,
+                            key = { it.id }
+                        ) { prize ->
+                            PrizeCard(
+                                prize = prize,
+                                onClick = { onPrizeClick(prize) },
+                                isFavorite = prize.id in favoriteIds,
+                                onFavoriteClick = { viewModel.toggleFavorite(prize.id) },
+                                showFavoriteButton = true
+                            )
                         }
                     }
                 }
 
-                is PrizeListState.Error -> {
+                is FavoritesState.Error -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = " ${currentState.message}",
-                            color = Color(0xFFD32F2F),
+                            text = currentState.message,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(16.dp)
                         )
                         Button(
-                            onClick = viewModel::loadPrizes,
+                            onClick = viewModel::loadFavorites,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFE3F2FD)
                             )

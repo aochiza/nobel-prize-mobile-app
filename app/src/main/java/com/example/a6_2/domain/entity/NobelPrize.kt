@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NobelPrize(
+    val id: Int = 0,
     val awardYear: String,
     val category: String,
     val categoryFullName: String,
